@@ -2,6 +2,8 @@
 
 # imports
 import re
+import csv
+from datetime import datetime
 
 # metadata for authorship information
 __author__ = 'Kobe Haukap'
@@ -13,7 +15,7 @@ __status__ = 'development'
 def validate_id(id):
 
     regex_id = '^[0-9]+$'
-    if re.compile(regex_id, id):
+    if re.match(regex_id, id):
         return ""
     else:
         return "I"
@@ -21,7 +23,7 @@ def validate_id(id):
     
 def validate_name(name):
 
-    parts = name.split()
+    parts = name.split(',')
     if len(parts) == 2:
         return ""
     else:
@@ -31,7 +33,7 @@ def validate_name(name):
 def validate_email(email):
 
     regex_email = r'^[\w-]+@\w+\.edu$'
-    if re.compile(regex_email, email):
+    if re.match(regex_email, email):
         return ""
     else:
         return "E"
@@ -48,8 +50,8 @@ def validate_phone(number):
 
 def validate_date(date):
 
-    regex_date = "%d-%m-%Y"
-    if re.compile(regex_date, date):
+    date_format = r'^\d{2}-\d{2}-\d{4}$'
+    if re.match(date_format, date):
         return ""
     else:
         return "D"
@@ -58,17 +60,40 @@ def validate_date(date):
 def validate_time(time):
 
     regex_time = "([01]?[0-9]|2[0-3]):[0-5][0-9]"
-    if re.compile(regex_time, time):
+    if re.match(regex_time, time):
         return ""
     else:
         return "T"
 
 
-def process_file(input_data, valid_data, invalid_data):
+def process_file():
 
-    with open('input_data.txt', 'a', newline='\n') as input_data
+    with open('input_data.txt', mode='r', newline='\n') as input_data:
+        input_reader = csv.reader(input_data, delimiter='|')
+        for lines in input_reader:
+            error_string = ""
+            data_count = len(lines)
+            if data_count == 6:
+                error_string += validate_id(lines[0])
+                error_string += validate_name(lines[1])
+                error_string += validate_email(lines[2])
+                error_string += validate_phone(lines[3])
+                error_string += validate_date(lines[4])
+                error_string += validate_time(lines[5])
+
+            else:
+                error_string = 'C'
+
+            if error_string == 'C':
+                with open('valid_data.txt', mode='a', newline='\n') as valid_data:
+                    valid_writer = csv.writer(valid_data, delimiter=',')
+                    valid_writer.writerow(lines)
+            else:
+                with open('invalid_data.txt', mode='a', newline='\n') as invalid_data:
+                    invalid_writer = csv.writer(invalid_data, delimiter='|')
+                    invalid_writer.writerow(error_string)
 
 
-def __main__():
+if __name__ == '__main__':
     process_file()
 
