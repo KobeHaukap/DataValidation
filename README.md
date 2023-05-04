@@ -1,4 +1,5 @@
 # DataValidation
+Simple program that validates the formatting of each line in an input file.
 
 ## Usage
 This program reads an input file and matches each data segment to a pattern. If the patterns and
